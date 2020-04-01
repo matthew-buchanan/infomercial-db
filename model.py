@@ -35,6 +35,6 @@ if __name__=='__main__':
   m = Model()
   m.seed_new()
   m.example()
-  print(repr(m))
+  print('products table created.')
   m.end()
 

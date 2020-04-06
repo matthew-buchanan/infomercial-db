@@ -54,32 +54,35 @@ def read_one(cs, id, colnames=False):
       SELECT * FROM products WHERE rowid={id}
     '''
     cs.execute(query)
-    res = cs.fetchall()
+    results = cs.fetchall()
     if colnames:
       cols = columns(cs)
-      zp = zip(cols, res)
+      zp = zip(cols, results)
       return dict(zp)
     else:
-      return res
+      return results
   except sqlite3.Error as err:
     return err
 
-def search(cs, **kwargs):
-  cols = tuple(kwargs.keys())
-  terms = tuple(kwargs.values())
-  wheres = ''
-  for elem in kwargs:
-    wheres += f'{elem}={kwargs[elem]}'
-    wheres += ' AND '
+def find(cs, name):
+  if len(name) is 0:
+    return ValueError
+  search = '%'.join(name) + '%'
   try:
-    query = f'''
-      SELECT {cols} FROM products WHERE {wheres}
+    qry = f'''
+      SELECT name, brand, price, 
+      name like "{search}" as s1,
+      brand like "{search}" as s2
+      FROM products WHERE s1=1 OR s2=1;
     '''
-    cs.execute(query)
-    res = cs.fetchall()
-    return res
+    cs.execute(qry)
+    results = cs.fetchall()
+    return results
   except sqlite3.Error as err:
-    return err
+    print(err)
+    print(qry)
+  
+
 
 def update(cs, col, val, id):
   try: 
